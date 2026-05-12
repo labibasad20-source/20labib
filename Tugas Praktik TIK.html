@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Labib Clothing</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background: linear-gradient(to right, #1f1f1f, #2c2c2c);
+            color: white;
+            text-align: center;
+        }
+
+        nav {
+            background: #111;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+       
+        header {
+            background: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 60px 30px;
+            position: relative;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        header * {
+            position: relative;
+        }
+
+        .logo {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+
+        .promo {
+            color: #00ffcc;
+        }
+
+        .produk {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            color: black;
+            width: 220px;
+            padding: 15px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        select, button {
+            width: 100%;
+            margin-top: 5px;
+            padding: 7px;
+        }
+
+        button {
+            background: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #keranjang li {
+            background: white;
+            color: black;
+            margin: 8px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .checkout {
+            margin-top: 20px;
+            background: white;
+            color: black;
+            padding: 15px;
+            border-radius: 10px;
+            width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        input {
+            width: 100%;
+            margin: 5px 0;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+let keranjang = JSON.parse(localStorage.getItem("keranjang")) || {};
+let total = 0;
+
+function simpanKeranjang() {
+    localStorage.setItem("keranjang", JSON.stringify(keranjang));
+}
+
+function tambahKeranjang(nama, harga, ukuran) {
+    let key = nama + " - " + ukuran;
+
+    if (keranjang[key]) {
+        keranjang[key].qty += 1;
+    } else {
+        keranjang[key] = { harga: harga, qty: 1 };
+    }
+
+    simpanKeranjang();
+    updateKeranjang();
+}
+
+function tambahItem(nama) {
+    keranjang[nama].qty += 1;
+    simpanKeranjang();
+    updateKeranjang();
+}
+
+function kurangItem(nama) {
+    keranjang[nama].qty -= 1;
+
+    if (keranjang[nama].qty <= 0) {
+        delete keranjang[nama];
+    }
+
+    simpanKeranjang();
+    updateKeranjang();
+}
+
+function hapusItem(nama) {
+    delete keranjang[nama];
+    simpanKeranjang();
+    updateKeranjang();
+}
+
+function updateKeranjang() {
+    let list = document.getElementById("keranjang");
+    list.innerHTML = "";
+    total = 0;
+
+    for (let nama in keranjang) {
+        let item = keranjang[nama];
+
+        let li = document.createElement("li");
+        li.innerHTML = `
+            <b>${nama}</b><br>
+            Qty:
+            <button onclick="kurangItem('${nama}')">-</button>
+            ${item.qty}
+            <button onclick="tambahItem('${nama}')">+</button>
+            <br>
+            Rp ${(item.harga * item.qty).toLocaleString("id-ID")}
+            <br>
+            <button onclick="hapusItem('${nama}')">❌ Hapus</button>
+        `;
+
+        list.appendChild(li);
+        total += item.harga * item.qty;
+    }
+
+    document.getElementById("total").textContent = total.toLocaleString("id-ID");
+}
+
+function checkout() {
+    let nama = document.getElementById("nama").value;
+    let alamat = document.getElementById("alamat").value;
+
+    if (nama == "" || alamat == "") {
+        alert("Isi dulu nama dan alamat!");
+        return;
+    }
+
+    if (Object.keys(keranjang).length == 0) {
+        alert("Keranjang kosong!");
+        return;
+    }
+
+    alert("Pesanan berhasil! Terima kasih sudah belanja 😊");
+
+    keranjang = {};
+    simpanKeranjang();
+    updateKeranjang();
+}
+
+window.onload = updateKeranjang;
+</script>
+
+<!-- NAVBAR -->
+<nav>
+    <h2>Labib Clothing</h2>
+    <ul>
+        <li>Home</li>
+        <li>Produk</li>
+        <li>Tentang</li>
+        <li>Kontak</li>
+    </ul>
+</nav>
+
+<!-- HEADER -->
+<header>
+    <img src="logo.webp" class="logo">
+    <h1>Selamat Datang di Labib Clothing</h1>
+    <p>Fashion keren dengan harga terjangkau</p>
+
+    <p class="promo">🔥 Diskon hari ini! Jangan sampai kehabisan</p>
+    <p>👕 Tampil percaya diri dengan outfit terbaikmu</p>
+</header>
+
+<!-- PRODUK -->
+<section class="produk">
+
+    <div class="card">
+        <img src="kaos polos.jpeg">
+        <h3>Kaos Polos</h3>
+        <p>Rp50.000</p>
+        <select id="s1"><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+        <button onclick="tambahKeranjang('Kaos Polos', 50000, document.getElementById('s1').value)">Beli</button>
+    </div>
+
+    <div class="card">
+        <img src="hoodie.webp">
+        <h3>Hoodie</h3>
+        <p>Rp120.000</p>
+        <select id="s2"><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+        <button onclick="tambahKeranjang('Hoodie', 120000, document.getElementById('s2').value)">Beli</button>
+    </div>
+
+    <div class="card">
+        <img src="sweater.webp">
+        <h3>Sweater</h3>
+        <p>Rp130.000</p>
+        <select id="s3"><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+        <button onclick="tambahKeranjang('Sweater', 130000, document.getElementById('s3').value)">Beli</button>
+    </div>
+
+    <div class="card">
+        <img src="jaket.webp">
+        <h3>Jaket</h3>
+        <p>Rp150.000</p>
+        <select id="s4"><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+        <button onclick="tambahKeranjang('Jaket', 150000, document.getElementById('s4').value)">Beli</button>
+    </div>
+
+    <div class="card">
+        <img src="kaos polo.webp">
+        <h3>Kaos Polo</h3>
+        <p>Rp200.000</p>
+        <select id="s5"><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+        <button onclick="tambahKeranjang('Kaos Polo', 200000, document.getElementById('s5').value)">Beli</button>
+    </div>
+
+    <div class="card">
+        <img src="kemeja.webp">
+        <h3>Kemeja</h3>
+        <p>Rp140.000</p>
+        <select id="s6"><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+        <button onclick="tambahKeranjang('Kemeja', 140000, document.getElementById('s6').value)">Beli</button>
+    </div>
+
+    <div class="card">
+        <img src="celana.webp">
+        <h3>Celana Panjang</h3>
+        <p>Rp180.000</p>
+        <select id="s7">
+            <option>32</option><option>33</option><option>34</option><option>35</option>
+            <option>36</option><option>37</option><option>38</option><option>39</option><option>40</option>
+        </select>
+        <button onclick="tambahKeranjang('Celana Panjang', 180000, document.getElementById('s7').value)">Beli</button>
+    </div>
+
+</section>
+
+<h2>Keranjang Belanja</h2>
+<ul id="keranjang"></ul>
+<p><b>Total: Rp <span id="total">0</span></b></p>
+
+<div class="checkout">
+    <h3>Checkout</h3>
+    <input type="text" id="nama" placeholder="Nama">
+    <input type="text" id="alamat" placeholder="Alamat">
+    <button onclick="checkout()">Checkout</button>
+</div>
+
+</body>
+</html>
